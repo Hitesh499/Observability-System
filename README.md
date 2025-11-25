@@ -79,12 +79,12 @@ docker compose up --build
 
 Step 2 — Confirm All Containers Are Running<br/>
 You should see:<br/>
-app<br/>
-prometheus<br/>
-grafana<br/>
-loki<br/>
-promtail<br/>
-jaeger<br/>
+1. app<br/>
+2. prometheus<br/>
+3. grafana<br/>
+4. loki<br/>
+5. promtail<br/>
+6. jaeger<br/>
 
 ## 5. Access the Tools
 | Tool                      | URL                                              |
@@ -176,8 +176,8 @@ docker compose down
 
 ## 10. Conclusion
 This project demonstrates a complete end-to-end, offline Observability System integrating:<br/>
-Metrics<br/>
-Logs<br/>
-Traces<br/>
-Dashboards<br/>
+1. Metrics<br/>
+2. Logs<br/>
+3. Traces<br/>
+4. Dashboards<br/>
 It is ready for learning, demos, and DevOps practice.
