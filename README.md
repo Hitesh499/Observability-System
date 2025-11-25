@@ -162,16 +162,12 @@ jobs:
 
 3. Required GitHub Secrets
 In GitHub Repo → Settings → Secrets and variables → Actions:
-```
 DOCKER_USERNAME → your Docker Hub username
 DOCKER_PASSWORD → your Docker Hub password or access token
-```
 
 ## 9. Docker Image
 The image is pushed to Docker Hub with the tag:
-```
 <DOCKER_USERNAME>/ci-cd-demo-app:latest
-```
 
 ## 10. Deployment on Minikube (Local Kubernetes)
 1. Start Minikube
@@ -247,13 +243,13 @@ Browser screenshot of minikube URL showing app running
 Optional: kubectl get pods output
 
 ## 12. Troubleshooting (Quick)
-Pod stuck in ImagePullBackOff
-Check if image exists on Docker Hub
-Ensure deployment.yaml uses correct image name and tag
-Make repo public or configure registry credentials for Kubernetes
-Service URL not working
-Verify pod status: kubectl get pods
-Re-check nodePort and service name
+Pod stuck in ImagePullBackOff<br/>
+Check if image exists on Docker Hub<br/>
+Ensure deployment.yaml uses correct image name and tag<br/>
+Make repo public or configure registry credentials for Kubernetes<br/>
+Service URL not working<br/>
+Verify pod status: kubectl get pods<br/>
+Re-check nodePort and service name<br/>
 
 Redeploy:
 ```
@@ -262,15 +258,12 @@ kubectl apply -f deployment.yaml
 ```
 
 ## 13. Possible Improvements
-Add real unit tests instead of dummy test
-Add environment variables via Kubernetes Secrets/ConfigMaps
-Add health checks (livenessProbe, readinessProbe)
-Integrate logging/monitoring (Prometheus, Grafana, Loki, etc.)
-Extend pipeline with linting, code coverage, or multi-stage Docker builds
+Add real unit tests instead of dummy test<br/>
+Add environment variables via Kubernetes Secrets/ConfigMaps<br/>
+Add health checks (livenessProbe, readinessProbe)<br/>
+Integrate logging/monitoring (Prometheus, Grafana, Loki, etc.)<br/>
+Extend pipeline with linting, code coverage, or multi-stage Docker builds<br/>
 
 ## 14. End result:
 This project demonstrates a fully working local CI/CD pipeline using GitHub Actions + Docker + Docker Hub + Minikube, with no cloud provider required.
-Process
-```
-Local Dev → GitHub → GitHub Actions → Docker Hub → Minikube → Browser
-```
+<br>Workflow Process: Local Dev → GitHub → GitHub Actions → Docker Hub → Minikube → Browser</br>
