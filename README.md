@@ -76,6 +76,7 @@ Step 1 — Start All Services
 ```
 docker compose up --build
 ```
+
 Step 2 — Confirm All Containers Are Running<br/>
 You should see:<br/>
 app<br/>
@@ -95,16 +96,19 @@ jaeger<br/>
 
 
 ## 6. Validation Checklist
+
 1️⃣ Metrics Check<br/>
 Open: http://localhost:5000/metrics<br/>
 Prometheus target status: http://localhost:9090/targets<br/>
 Targets must show: Up<br/>
+
 2️⃣ Logs Check<br/>
 Open Grafana → Explore → Loki<br/>
 Run query:<br/>
 {job="app_logs"}<br/>
 Or:<br/>
 {job="varlogs"}<br/>
+
 3️⃣ Traces Check<br/>
 Open: http://localhost:16686<br/>
 Select service: flask-app<br/>
@@ -118,10 +122,12 @@ Dashboards auto-load from:<br/>
 grafana/dashboards-json/<br/>
 
 ## 7. Configurations Used
+
 1. Prometheus
 Scrapes metrics from the Flask app<br/>
 Scrapes itself<br/>
 File: prometheus/prometheus.yml<br/>
+
 2. Grafana
 Auto-provisioned dashboards
 Auto-configured Prometheus + Loki data sources
@@ -130,18 +136,22 @@ Files:
 grafana/provisioning/datasources/*.yml
 grafana/provisioning/dashboards/*.yml
 ```
+
 3. Loki
 Stores logs locally<br/>
 14-day retention<br/>
 File: loki/loki-config.yaml<br/>
+
 4. Promtail
 Reads logs from:<br/>
 /var/log/*.log<br/>
 Docker container logs<br/>
 File: promtail/promtail-config.yaml <br/>
+
 5. Jaeger
 All-in-one tracing setup<br/>
 Trace UI at port 16686<br/>
+
 6. Flask App
 Includes:<br/>
 Prometheus multiprocess metrics<br/>
