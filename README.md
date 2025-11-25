@@ -2,259 +2,172 @@
 
 ## 1. Overview
 
-This project implements a **complete CI/CD pipeline** that:
+This project demonstrates how to build a complete observability stack using:
+| Component             | Purpose                               |
+| --------------------- | ------------------------------------- |
+| **Prometheus**        | Collects & stores application metrics |
+| **Grafana**           | Visualizes metrics, logs, and traces  |
+| **Loki**              | Centralized log storage               |
+| **Promtail**          | Log collector for Loki                |
+| **Jaeger**            | Distributed tracing                   |
+| **Flask Application** | Demo service with metrics/tracing     |
+| **Docker Compose**    | Orchestrates all services             |
 
-- Builds a Docker image for a simple Node.js web application  
-- Runs tests on every change  
-- Pushes the image to **Docker Hub**  
-- Deploys the app locally using **Minikube** (Kubernetes)  
-
-No cloud provider (AWS/GCP/Azure) is required — everything runs on your local machine.
-
----
+This system helps you monitor:<br/>
+Application performance metrics<br/>
+Application & system logs<br/>
+Complete request trace flow across services<br/>
 
 ## 2. Architecture
 
 **Flow:**
-
-1. Developer writes code and pushes to **GitHub** (`main` branch)  
-2. **GitHub Actions** workflow runs:
-   - Installs dependencies
-   - Runs tests
-   - Builds Docker image
-   - Pushes image to **Docker Hub**
-3. **Minikube** (local Kubernetes cluster) pulls the image from Docker Hub  
-4. Kubernetes Deployment + Service expose the app locally  
-
-## 3. Tech Stack
-1. Language: Node.js (Express)
-2. Containerization: Docker
-3. CI/CD: GitHub Actions
-4. Image Registry: Docker Hub
-5. Orchestration: Kubernetes (Minikube)
-6. Local Dev Helper: docker-compose (for local testing only)
-
-## 4. Project Structure
 ```
-project-root/
+                       ┌──────────────┐
+                       │   Grafana    │
+                       │  Dashboards  │
+                       └──────┬───────┘
+                Metrics       │      Logs & Traces
+                              │
+     ┌───────────┬────────────┴──────────┬───────────┐
+     │           │                        │           │
+┌────────┐  ┌──────────┐        ┌─────────────┐   ┌──────────┐
+│  App   │→│Prometheus │→────→  │    Loki     │←──│ Promtail │
+│        │  │          │        │ (Log Store) │   │ (Logs)   │
+└────────┘  └──────────┘        └─────────────┘   └──────────┘
+      │
+      ↓  Traces
+ ┌─────────────┐
+ │   Jaeger    │
+ └─────────────┘
+```
+
+## 3. Project Structure
+```
+ObservabilitySystem/
 │
 ├── app/
-│   └── server.js              # Express application
+│   ├── app.py
+│   ├── Dockerfile
+│   └── requirements.txt
 │
-├── tests/
-│   └── sample.test.js         # Basic test
+├── prometheus/
+│   └── prometheus.yml
 │
-├── Dockerfile                 # Docker image definition
-├── docker-compose.yml         # Local Docker compose (optional dev)
-├── deployment.yaml            # Kubernetes Deployment + Service
-├── package.json               # Node.js project config
+├── grafana/
+│   ├── provisioning/
+│   │   ├── datasources/
+│   │   │   └── observability-datasources.yml
+│   │   └── dashboards/
+│   │       └── observability-dashboard.yml
+│   └── dashboards-json/
+│       └── observability.json
 │
-└── .github/
-    └── workflows/
-        └── ci-cd.yml          # GitHub Actions CI/CD workflow
+├── loki/
+│   └── loki-config.yaml
+│
+├── promtail/
+│   └── promtail-config.yaml
+│
+└── docker-compose.yml
 ```
 
-## 5. Prerequisites
-You should have the following installed:
-1. Git
-2. Node.js (v18+ recommended)
-3. Docker Desktop
-4. Docker Hub account
-5. Minikube
-6. kubectl
-7. GitHub repository
-
-## 6. Local Development (Without CI/CD)
-1. Install Dependencies
---> npm install
-2. Run Tests
---> npm test
-3. Run App Locally (Node)
---> npm start
-App will be available at -
-http://localhost:3000
-4. Run with Docker Locally (Optional)
-with docker-compose: docker-compose up --build
-
-## 7. Dockerfile
-The Dockerfile uses a small Node.js base image and runs the app:
+## 4. How to Run the Observability System
+Step 1 — Start All Services
 ```
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npm", "start"]
+docker compose up --build
 ```
+Step 2 — Confirm All Containers Are Running<br/>
+You should see:<br/>
+app<br/>
+prometheus<br/>
+grafana<br/>
+loki<br/>
+promtail<br/>
+jaeger<br/>
 
-## 8. GitHub Actions CI/CD Workflow
-Path: .github/workflows/ci-cd.yml
-1. What the Pipeline Does<br/>
-On every push or pull request to main:<br/>
-Checks out code<br/>
-Sets up Node.js<br/>
-Installs dependencies<br/>
-Runs tests<br/>
-Sets up Docker Buildx<br/>
-Logs in to Docker Hub<br/>
-Builds and pushes the Docker image to Docker Hub<br/>
+## 5. Access the Tools
+| Tool                      | URL                                              |
+| ------------------------- | ------------------------------------------------ |
+| **Flask App**             | [http://localhost:5000](http://localhost:5000)   |
+| **Prometheus Metrics UI** | [http://localhost:9090](http://localhost:9090)   |
+| **Grafana Dashboard**     | [http://localhost:3000](http://localhost:3000)   |
+| **Jaeger Tracing UI**     | [http://localhost:16686](http://localhost:16686) |
 
-2. Workflow Definition
+
+## 6. Validation Checklist
+1️⃣ Metrics Check<br/>
+Open: http://localhost:5000/metrics<br/>
+Prometheus target status: http://localhost:9090/targets<br/>
+Targets must show: Up<br/>
+2️⃣ Logs Check<br/>
+Open Grafana → Explore → Loki<br/>
+Run query:<br/>
+{job="app_logs"}<br/>
+Or:<br/>
+{job="varlogs"}<br/>
+3️⃣ Traces Check<br/>
+Open: http://localhost:16686<br/>
+Select service: flask-app<br/>
+Click Search Traces → traces must appear.<br/>
+
+4️⃣ Grafana Dashboard Check<br/>
+Login:<br/>
+Username: admin<br/>
+Password: admin<br/>
+Dashboards auto-load from:<br/>
+grafana/dashboards-json/<br/>
+
+## 7. Configurations Used
+1. Prometheus
+Scrapes metrics from the Flask app<br/>
+Scrapes itself<br/>
+File: prometheus/prometheus.yml<br/>
+2. Grafana
+Auto-provisioned dashboards
+Auto-configured Prometheus + Loki data sources
+Files:
 ```
-name: CI-CD Pipeline
+grafana/provisioning/datasources/*.yml
+grafana/provisioning/dashboards/*.yml
+```
+3. Loki
+Stores logs locally<br/>
+14-day retention<br/>
+File: loki/loki-config.yaml<br/>
+4. Promtail
+Reads logs from:<br/>
+/var/log/*.log<br/>
+Docker container logs<br/>
+File: promtail/promtail-config.yaml <br/>
+5. Jaeger
+All-in-one tracing setup<br/>
+Trace UI at port 16686<br/>
+6. Flask App
+Includes:<br/>
+Prometheus multiprocess metrics<br/>
+OpenTelemetry tracing<br/>
+Jaeger exporter<br/>
+Custom logging<br/>
+Environment variables set inside docker-compose.yml.
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  build-test-push:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Run Tests
-        run: npm test
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and Push image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/ci-cd-demo-app:latest
+## 8. To Stop Services
+```
+docker compose down
 ```
 
-3. Required GitHub Secrets<br/>
-In GitHub Repo → Settings → Secrets and variables → Actions:<br/>
-DOCKER_USERNAME → your Docker Hub username<br/>
-DOCKER_PASSWORD → your Docker Hub password or access token<br/>
+## 9. Project Completed When…
+✔ All containers are healthy
+✔ Prometheus shows metrics
+✔ Grafana shows dashboards
+✔ Loki shows logs
+✔ Jaeger shows traces
+✔ Flask app responds
+✔ No errors in Docker logs
 
-## 9. Docker Image
-The image is pushed to Docker Hub with the tag:<br/>
-<DOCKER_USERNAME>/ci-cd-demo-app:latest
-
-## 10. Deployment on Minikube (Local Kubernetes)
-1. Start Minikube<br/>
-minikube start --driver=docker<br/>
-Verify node:<br/>
-kubectl get nodes<br/>
-You should see the minikube node in Ready state.<br/>
-
-2. Kubernetes Manifest (deployment.yaml)
-```
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ci-cd-demo-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ci-cd-demo-app
-  template:
-    metadata:
-      labels:
-        app: ci-cd-demo-app
-    spec:
-      containers:
-      - name: ci-cd-demo-app
-        image: <your-docker-username>/ci-cd-demo-app:latest
-        ports:
-        - containerPort: 3000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ci-cd-demo-service
-spec:
-  type: NodePort
-  selector:
-    app: ci-cd-demo-app
-  ports:
-    - port: 3000
-      targetPort: 3000
-      nodePort: 30080
-```
-
-3. Apply Deployment
-```
-kubectl apply -f deployment.yaml
-```
-Check pods: kubectl get pods
-
-4. Access the Application<br/>
-minikube service ci-cd-demo-service<br/>
-You’ll get a URL like: http://192.168.49.2:30080<br/>
-
-## 11. Deliverables Checklist
-You can use this section when submitting or demonstrating the project:
-✅ GitHub Repository with:
-App source code
-Dockerfile
-deployment.yaml
-.github/workflows/ci-cd.yml
-
-✅ Docker Image Link (Docker Hub), e.g.:<br/>
-https://hub.docker.com/r/<your-docker-username>/ci-cd-demo-app<br/>
-
-
-✅ GitHub Actions CI/CD Workflow Results<br/>
-Screenshot/URL of successful workflow run<br/>
-
-✅ Screenshots of Deployed App<br/>
-Browser screenshot of minikube URL showing app running<br/>
-Optional: kubectl get pods output<br/>
-
-## 12. Troubleshooting (Quick)
-Pod stuck in ImagePullBackOff<br/>
-Check if image exists on Docker Hub<br/>
-Ensure deployment.yaml uses correct image name and tag<br/>
-Make repo public or configure registry credentials for Kubernetes<br/>
-Service URL not working<br/>
-Verify pod status: kubectl get pods<br/>
-Re-check nodePort and service name<br/>
-
-Redeploy:
-```
-kubectl delete -f deployment.yaml
-kubectl apply -f deployment.yaml
-```
-
-## 13. Possible Improvements
-Add real unit tests instead of dummy test<br/>
-Add environment variables via Kubernetes Secrets/ConfigMaps<br/>
-Add health checks (livenessProbe, readinessProbe)<br/>
-Integrate logging/monitoring (Prometheus, Grafana, Loki, etc.)<br/>
-Extend pipeline with linting, code coverage, or multi-stage Docker builds<br/>
-
-## 14. End result:
-This project demonstrates a fully working local CI/CD pipeline using GitHub Actions + Docker + Docker Hub + Minikube, with no cloud provider required.
-<br>Workflow Process: Local Dev → GitHub → GitHub Actions → Docker Hub → Minikube → Browser</br>
+## 10. Conclusion
+This project demonstrates a complete end-to-end, offline Observability System integrating:<br/>
+Metrics<br/>
+Logs<br/>
+Traces<br/>
+Dashboards<br/>
+It is ready for learning, demos, and DevOps practice.
