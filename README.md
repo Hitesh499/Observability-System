@@ -26,12 +26,6 @@ No cloud provider (AWS/GCP/Azure) is required — everything runs on your local 
 3. **Minikube** (local Kubernetes cluster) pulls the image from Docker Hub  
 4. Kubernetes Deployment + Service expose the app locally  
 
-High-level pipeline:
-
-```text
-Local Dev → GitHub → GitHub Actions → Docker Hub → Minikube → Browser
-```
-
 ## 3. Tech Stack
 1. Language: Node.js (Express)
 2. Containerization: Docker
@@ -78,10 +72,8 @@ You should have the following installed:
 3. Run App Locally (Node)
 --> npm start
 App will be available at -
-```
 http://localhost:3000
-```
-5. Run with Docker Locally (Optional)
+4. Run with Docker Locally (Optional)
 with docker-compose: docker-compose up --build
 
 ## 7. Dockerfile
@@ -103,15 +95,15 @@ CMD ["npm", "start"]
 
 ## 8. GitHub Actions CI/CD Workflow
 Path: .github/workflows/ci-cd.yml
-1. What the Pipeline Does
-On every push or pull request to main:
-Checks out code
-Sets up Node.js
-Installs dependencies
-Runs tests
-Sets up Docker Buildx
-Logs in to Docker Hub
-Builds and pushes the Docker image to Docker Hub
+1. What the Pipeline Does<br/>
+On every push or pull request to main:<br/>
+Checks out code<br/>
+Sets up Node.js<br/>
+Installs dependencies<br/>
+Runs tests<br/>
+Sets up Docker Buildx<br/>
+Logs in to Docker Hub<br/>
+Builds and pushes the Docker image to Docker Hub<br/>
 
 2. Workflow Definition
 ```
@@ -160,21 +152,21 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/ci-cd-demo-app:latest
 ```
 
-3. Required GitHub Secrets
-In GitHub Repo → Settings → Secrets and variables → Actions:
-DOCKER_USERNAME → your Docker Hub username
-DOCKER_PASSWORD → your Docker Hub password or access token
+3. Required GitHub Secrets<br/>
+In GitHub Repo → Settings → Secrets and variables → Actions:<br/>
+DOCKER_USERNAME → your Docker Hub username<br/>
+DOCKER_PASSWORD → your Docker Hub password or access token<br/>
 
 ## 9. Docker Image
-The image is pushed to Docker Hub with the tag:
+The image is pushed to Docker Hub with the tag:<br/>
 <DOCKER_USERNAME>/ci-cd-demo-app:latest
 
 ## 10. Deployment on Minikube (Local Kubernetes)
-1. Start Minikube
-minikube start --driver=docker
-Verify node:
-kubectl get nodes
-You should see the minikube node in Ready state.
+1. Start Minikube<br/>
+minikube start --driver=docker<br/>
+Verify node:<br/>
+kubectl get nodes<br/>
+You should see the minikube node in Ready state.<br/>
 
 2. Kubernetes Manifest (deployment.yaml)
 ```
@@ -218,9 +210,9 @@ kubectl apply -f deployment.yaml
 ```
 Check pods: kubectl get pods
 
-4. Access the Application
-minikube service ci-cd-demo-service
-You’ll get a URL like: http://192.168.49.2:30080
+4. Access the Application<br/>
+minikube service ci-cd-demo-service<br/>
+You’ll get a URL like: http://192.168.49.2:30080<br/>
 
 ## 11. Deliverables Checklist
 You can use this section when submitting or demonstrating the project:
@@ -230,17 +222,16 @@ Dockerfile
 deployment.yaml
 .github/workflows/ci-cd.yml
 
-✅ Docker Image Link (Docker Hub), e.g.:
-```
-https://hub.docker.com/r/<your-docker-username>/ci-cd-demo-app
-```
+✅ Docker Image Link (Docker Hub), e.g.:<br/>
+https://hub.docker.com/r/<your-docker-username>/ci-cd-demo-app<br/>
 
-✅ GitHub Actions CI/CD Workflow Results
-Screenshot/URL of successful workflow run
 
-✅ Screenshots of Deployed App
-Browser screenshot of minikube URL showing app running
-Optional: kubectl get pods output
+✅ GitHub Actions CI/CD Workflow Results<br/>
+Screenshot/URL of successful workflow run<br/>
+
+✅ Screenshots of Deployed App<br/>
+Browser screenshot of minikube URL showing app running<br/>
+Optional: kubectl get pods output<br/>
 
 ## 12. Troubleshooting (Quick)
 Pod stuck in ImagePullBackOff<br/>
