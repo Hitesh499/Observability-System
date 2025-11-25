@@ -1,0 +1,32 @@
+{
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "type": "graph",
+      "title": "HTTP Requests (rate)",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[1m])",
+          "format": "time_series"
+        }
+      ],
+      "id": 1
+    },
+    {
+      "type": "graph",
+      "title": "Request Latency (histogram quantiles)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_latency_seconds_bucket[1m])) by (le))",
+          "format": "time_series"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_latency_seconds_bucket[1m])) by (le))",
+          "format": "time_series"
+        }
+      ],
+      "id": 2
+    }
+  ],
+  "title": "Simple Observability Dashboard"
+}

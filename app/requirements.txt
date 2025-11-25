@@ -1,0 +1,14 @@
+flask
+prometheus_client
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-flask
+opentelemetry-exporter-jaeger
+python-json-logger
+gunicorn
+flask
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation
+opentelemetry-exporter-jaeger
+deprecated

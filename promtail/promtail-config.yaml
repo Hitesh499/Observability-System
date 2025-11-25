@@ -1,0 +1,68 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: info          # added for verbosity
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 102400
+    timeout: 60s
+    backoff_config:
+      min_period: 500ms
+      max_period: 5s
+      max_retries: 5
+
+scrape_configs:
+
+  # ------------------------------------------------------------
+  # System Logs
+  # ------------------------------------------------------------
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          host: "${HOSTNAME}"
+          __path__: /var/log/*log
+
+    pipeline_stages:
+      - docker: {}          # Normalizes timestamps
+      - regex:
+          expression: "^(?P<message>.*)$"
+      - labeldrop: ["filename"]
+
+  # ------------------------------------------------------------
+  # Docker Logs (Container logs)
+  # ------------------------------------------------------------
+  - job_name: docker-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          host: "${HOSTNAME}"
+          __path__: /var/lib/docker/containers/*/*.log
+
+    pipeline_stages:
+      - docker: {} # extracts log + timestamp from docker JSON log
+      - labeldrop:
+          - "__path__"
+
+  # ------------------------------------------------------------
+  # Journald logs (Optional)
+  # ------------------------------------------------------------
+  # Uncomment this block if you want journald logs
+  #
+  # - job_name: journald
+  #   journal:
+  #     max_age: 12h
+  #     labels:
+  #       job: systemd
+  #   relabel_configs:
+  #     - source_labels: ['__journal__systemd_unit']
+  #       target_label: 'unit'
